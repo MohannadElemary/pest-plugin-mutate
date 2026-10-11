@@ -270,15 +270,11 @@ class StreamWrapper
     public function url_stat(string $path, int $flags): array|bool
     {
         return $this->withOriginalWrapper(function () use ($path, $flags): false|array {
-            if (is_readable($path) === false) {
-                return false;
-            }
-
             if (($flags & STREAM_URL_STAT_LINK) !== 0) {
-                return lstat($path);
+                return is_link($path) || file_exists($path) ? lstat($path) : false;
             }
 
-            return stat($path);
+            return file_exists($path) ? stat($path) : false;
         });
     }
 
